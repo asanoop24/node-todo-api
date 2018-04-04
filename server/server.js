@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {ToDo} = require('./models/todo');
@@ -9,6 +10,9 @@ var app = express();
 
 app.use(bodyParser.json());
 
+//-----------------------------------------------------------------------------//
+// POSTing a new ToDo to the todos collection
+//-----------------------------------------------------------------------------//
 app.post('/todos', (request, response) => {
   var todo = new ToDo({
     text: request.body.text
@@ -24,6 +28,9 @@ app.post('/todos', (request, response) => {
   });
 });
 
+//-----------------------------------------------------------------------------//
+// POSTing a new User to the users collection
+//-----------------------------------------------------------------------------//
 app.post('/users', (request, response) => {
   var user = new User({
     name: request.body.name,
@@ -42,6 +49,9 @@ app.post('/users', (request, response) => {
 });
 
 
+//-----------------------------------------------------------------------------//
+// GETting all the todos in the todos collection
+//-----------------------------------------------------------------------------//
 app.get('/todos', (request, response) => {
   ToDo.find()
   .then((todos) => {
@@ -49,6 +59,23 @@ app.get('/todos', (request, response) => {
       todos,
       status: 'Passed'
     });
+  })
+  .catch((error) => {
+    response.status(400).send(error);
+  });
+});
+
+//-----------------------------------------------------------------------------//
+// GETting a specific todo in the todos collection by id
+//-----------------------------------------------------------------------------//
+app.get('/todos/:id', (request, response) => {
+  var id = request.params.id;
+  if(!ObjectID.isValid(id)) response.status(404).send({});
+
+  ToDo.findById(id)
+  .then((todo) => {
+    if(!todo) response.status(404).send({});
+    response.status(200).send(todo);
   })
   .catch((error) => {
     response.status(400).send(error);
