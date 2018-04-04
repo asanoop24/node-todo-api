@@ -70,11 +70,11 @@ app.get('/todos', (request, response) => {
 //-----------------------------------------------------------------------------//
 app.get('/todos/:id', (request, response) => {
   var id = request.params.id;
-  if(!ObjectID.isValid(id)) response.status(404).send({});
+  if(!ObjectID.isValid(id)) return response.status(404).send({});
 
   ToDo.findById(id)
   .then((todo) => {
-    if(!todo) response.status(404).send({});
+    if(!todo) return response.status(404).send({});
     response.status(200).send(todo);
   })
   .catch((error) => {
@@ -86,3 +86,6 @@ app.get('/todos/:id', (request, response) => {
 app.listen(3000, () => {
   console.log('Server running on port 3000');
 });
+
+
+module.exports.app = app;
